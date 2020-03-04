@@ -15,17 +15,43 @@ class AnnonceController extends Controller
      */
     public function index(Request $request)
     {
+        //Return Response()->json(['success'=>$request->all()]);
         $path=storage_path('app/public/uploads');
         if($request->hasFile('file'));{
             foreach ($request->file as $photo) {
-            $filename = uniqid() . '_' . trim($photo->getClientOriginalName());
+            /* $filename = uniqid() . '_' . trim($photo->getClientOriginalName());
             //$photo->move($path, $filename);
             //Storage::put('/uploads'.$filename,fopen($photo, 'r+'));
-            $p=$photo->store('uploads');
+            $p=$photo->store('uploads/'.date('Y').'-'.date('m'));
             $annonce=new Annonce();
             $annonce->nom=$request->nom;
             $annonce->file=$p;
+            $annonce->save(); */
+            //$image = $request->file('image');
+
+            $image_name = time() . '.' . $photo->getClientOriginalExtension();
+
+            $destinationPath = public_path('storage/thumbnail') . '/'.date('Y').'-'.date('m').'/' ;
+
+            $resize_image = \Image::make($photo->getRealPath());
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+                $resize_image->resize(600, 300, function($constraint){
+                    $constraint->aspectRatio();
+                   })->save($destinationPath. $image_name);
+            }else{
+                $resize_image->resize(600, 300, function($constraint){
+                    $constraint->aspectRatio();
+                   })->save($destinationPath. $image_name);
+            }
+            $annonce=new Annonce();
+            $annonce->nom=$request->nom;
+            $annonce->file=$destinationPath. $image_name;
             $annonce->save();
+
+            //$destinationPath = public_path('/images');
+
+           // $photo->move($destinationPath, $image_name);
         }
         Return Response()->json(['success'=>true]);
         }

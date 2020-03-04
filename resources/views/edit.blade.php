@@ -43,6 +43,7 @@
                         Choisir une photo à importer .<BR>
                         <i class="fa fa-picture-o" aria-hidden="true"></i>
                       </DIV>
+
                 </div>
             </form>
             <div>
@@ -50,37 +51,50 @@
             </div>
 
         </div>
-        <script>
-            var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content')
-            //<img src="{{asset('storage/uploads/4Y7lxss02G7JZU583IAwqk4Q1icwbM5kTB8oj2bU.png')}}" alt="">
-            Dropzone.options.myDropzone = {
 
-                url: "/add",
-                headers: {
-                    'x-csrf-token': CSRF_TOKEN,
-                },
-
-                autoProcessQueue: false,
-                uploadMultiple: true,
-                parallelUploads: 100,
-                maxFiles: 100,
-                acceptedFiles: "image/*",
-                addRemoveLinks: true,
-                init: function () {
-
-                    var submitButton = document.querySelector("#submit-all");
-                    var wrapperThis = this;
-
-                    submitButton.addEventListener("click", function () {
-                        wrapperThis.processQueue();
-                    });
-
-                    this.on('sendingmultiple', function (data, xhr, formData) {
-                        console.log(formData)
-                        formData.append("nom", $("#Username").val());
-                    });
-                }
-            };
-        </script>
     </body>
+    <script>
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content')
+        //<img src="{{asset('storage/uploads/4Y7lxss02G7JZU583IAwqk4Q1icwbM5kTB8oj2bU.png')}}" alt="">
+        Dropzone.options.myDropzone = {
+
+            url: "/add",
+            headers: {
+                'x-csrf-token': CSRF_TOKEN,
+            },
+
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 100,
+            maxFiles: 100,
+            //acceptedFiles: "image/*",
+            addRemoveLinks: true,
+            init: function () {
+                var mockFile = { name: 'test.jpg', size: '88' };
+                thisDropzone=this;
+                thisDropzone.options.addedfile.call(thisDropzone, mockFile);
+
+                thisDropzone.options.thumbnail.call(thisDropzone, mockFile, "{{asset('storage/uploads/4Y7lxss02G7JZU583IAwqk4Q1icwbM5kTB8oj2bU.png')}}");
+                var submitButton = document.querySelector("#submit-all");
+                var wrapperThis = this;
+                $(".dz-remove").on("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var imageId = $(this).parent().find(".dz-filename > span").text();
+
+                    console.log(imageId)
+
+               });
+                submitButton.addEventListener("click", function () {
+                    wrapperThis.processQueue();
+                });
+
+                this.on('sendingmultiple', function (data, xhr, formData) {
+                    console.log(formData)
+                    formData.append("nom", $("#Username").val());
+                });
+            }
+        };
+    </script>
 </html>
